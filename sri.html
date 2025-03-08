@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate Bill - Sri Vaari Mobiles</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #imageContainer {
+      margin-top: 20px;
+    }
+
+    #downloadLink {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Sri Vaari Mobiles</h1>
+    <form id="inputForm">
+      <label for="name">Customer Name:</label>
+      <input type="text" id="name" placeholder="Enter customer name" required>
+
+      <label for="mobile">Mobile Number:</label>
+      <input type="text" id="mobile" placeholder="Enter mobile number" required>
+
+      <label for="date">Bill Date:</label>
+      <input type="date" id="date" required>
+
+      <label for="model">Mobile Model:</label>
+      <input type="text" id="model" placeholder="Enter mobile model" required>
+
+      <label for="imei1">IMEI No 1:</label>
+      <input type="text" id="imei1" placeholder="Enter IMEI No 1" required>
+
+      <label for="imei2">IMEI No 2:</label>
+      <input type="text" id="imei2" placeholder="Enter IMEI No 2">
+
+      <label for="battery">Battery ID:</label>
+      <input type="text" id="battery" placeholder="Enter battery ID">
+
+      <label for="charger">Charger ID:</label>
+      <input type="text" id="charger" placeholder="Enter charger ID">
+
+      <label for="price">Mobile Price (₹):</label>
+      <input type="number" id="price" placeholder="Enter mobile price" required>
+
+      <button type="button" onclick="generateBill()">Generate Bill</button>
+    </form>
+
+    <div id="imageContainer" class="hidden">
+      <canvas id="canvas"></canvas>
+      <a id="downloadLink" class="hidden">Download Bill</a>
+    </div>
+  </div>
+
+  <script>
+    function generateBill() {
+      // Get input values
+      const name = document.getElementById('name').value;
+      const mobile = document.getElementById('mobile').value;
+      const date = document.getElementById('date').value;
+      const model = document.getElementById('model').value;
+      const imei1 = document.getElementById('imei1').value;
+      const imei2 = document.getElementById('imei2').value;
+      const battery = document.getElementById('battery').value;
+      const charger = document.getElementById('charger').value;
+      const price = document.getElementById('price').value;
+
+      // Validate required fields
+      if (!name || !mobile || !date || !model || !imei1 || !price) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+      // Get canvas and context
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Set canvas size (A4 width: 595px, height: 842px)
+      canvas.width = 595; // A4 width in pixels
+      canvas.height = 842; // A4 height in pixels
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Add border
+      ctx.strokeStyle = '#000';
+      ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+      // Header Section
+      ctx.font = '20px Arial';
+      ctx.fillStyle = '#000';
+      ctx.fillText('Sri Vaari Mobiles', 200, 40);
+
+      // Shop details
+      ctx.font = '12px Arial';
+      ctx.fillText('Address: 555/249 Cuddalore Main Road, Bazaar Street, Attur', 20, 70);
+      ctx.fillText('Contact: 7010082120', 20, 90);
+
+      // Add space for logo (top-right)
+      ctx.strokeRect(canvas.width - 120, 20, 100, 50);
+      ctx.font = '12px Arial';
+      ctx.fillText('Logo Space', canvas.width - 110, 50);
+
+      // Header-Body Separator Line
+      ctx.beginPath();
+      ctx.moveTo(10, 110);
+      ctx.lineTo(canvas.width - 10, 110);
+      ctx.stroke();
+
+      // Body Section
+      ctx.font = '18px Arial';
+      ctx.fillText('Customer Bill', 240, 140);
+
+      // Define starting position for details
+      const startX = 20;
+      let startY = 170;
+
+      // Function to draw aligned text
+      function drawAlignedText(label, value, y) {
+        ctx.fillText(`${label}:`, startX, y);
+        ctx.fillText(value, startX + 150, y); // Align values after colons
+      }
+
+      // Add customer details
+      ctx.font = '14px Arial';
+      drawAlignedText('Customer Name', name, startY);
+      drawAlignedText('Mobile Number', mobile, startY + 30);
+      drawAlignedText('Bill Date', date, startY + 60);
+
+      // Add mobile details
+      drawAlignedText('Mobile Model', model, startY + 90);
+      drawAlignedText('IMEI No 1', imei1, startY + 120);
+      drawAlignedText('IMEI No 2', imei2 || 'N/A', startY + 150);
+      drawAlignedText('Battery ID', battery || 'N/A', startY + 180);
+      drawAlignedText('Charger ID', charger || 'N/A', startY + 210);
+
+      // Add 4 empty lines between Charger ID and Price
+      startY += 240; // Move down by 4 lines (4 * 30px)
+
+      // Add price (right-aligned)
+      ctx.font = '16px Arial';
+      ctx.fillText('Mobile Price:', startX + 40, startY); // Indent by 40px
+      ctx.textAlign = 'right';
+      ctx.fillText(`₹${price}`, canvas.width - 20, startY);
+      ctx.textAlign = 'left'; // Reset alignment
+
+      // Footer Section
+      ctx.beginPath();
+      ctx.moveTo(10, startY + 30);
+      ctx.lineTo(canvas.width - 10, startY + 30);
+      ctx.stroke();
+
+      // Footer text
+      ctx.font = '14px Arial';
+      ctx.fillText('For Sri Vaari Mobiles', 220, startY + 60);
+
+      // Add line below footer text
+      ctx.beginPath();
+      ctx.moveTo(10, startY + 70);
+      ctx.lineTo(canvas.width - 10, startY + 70);
+      ctx.stroke();
+
+      // Show the image container
+      const imageContainer = document.getElementById('imageContainer');
+      imageContainer.classList.remove('hidden');
+
+      // Create download link
+      const downloadLink = document.getElementById('downloadLink');
+      const dataURL = canvas.toDataURL('image/png');
+      downloadLink.href = dataURL;
+      downloadLink.download = 'customer_bill.png';
+      downloadLink.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
